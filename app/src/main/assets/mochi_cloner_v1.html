@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MochiCloner Mini — Step 3</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    #virtual-map {
+      height: 340px;
+      width: 100%;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <div class="max-w-5xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+    <!-- Header -->
+    <header class="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xl font-bold shadow-sm">
+          🍡
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold text-slate-900">MochiCloner Mini</h1>
+          <p class="text-xs sm:text-sm text-slate-500">Step 3: Clone any app, customize, &amp; freeze virtual GPS anywhere on the map</p>
+        </div>
+      </div>
+      <span id="clone-count-badge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+        2 Clones Active
+      </span>
+    </header>
+
+    <!-- Part 1: Create a New Clone (Any App) -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">1. Create a New Clone (Any App)</h2>
+        <p class="text-sm text-slate-500">Type any app name or pick a preset, choose an icon, and set its starting location.</p>
+      </div>
+
+      <form id="clone-form" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div>
+            <label for="app-name-input" class="block text-xs font-medium text-slate-600 mb-1">App Name (Any App)</label>
+            <input
+              id="app-name-input"
+              type="text"
+              list="app-presets"
+              maxlength="30"
+              required
+              placeholder="e.g. WhatsApp, Free Fire..."
+              value="ChatWave"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <datalist id="app-presets">
+              <option value="ChatWave"></option>
+              <option value="SocialSnap"></option>
+              <option value="QuestArena"></option>
+              <option value="MailBox"></option>
+              <option value="WhatsApp"></option>
+              <option value="Instagram"></option>
+              <option value="Telegram"></option>
+            </datalist>
+          </div>
+
+          <div>
+            <label for="clone-label" class="block text-xs font-medium text-slate-600 mb-1">Instance Label</label>
+            <input
+              id="clone-label"
+              type="text"
+              maxlength="24"
+              placeholder="e.g. Work, Alt Account"
+              class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label for="icon-select" class="block text-xs font-medium text-slate-600 mb-1">App Icon &amp; Color</label>
+            <select id="icon-select" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="💬|bg-emerald-500">💬 Chat Green</option>
+              <option value="📸|bg-pink-500">📸 Social Pink</option>
+              <option value="🎮|bg-violet-500">🎮 Game Violet</option>
+              <option value="✉️|bg-sky-500">✉️ Mail Blue</option>
+              <option value="🛒|bg-amber-500">🛒 Shop Amber</option>
+              <option value="🎵|bg-rose-500">🎵 Music Rose</option>
+              <option value="📍|bg-teal-500">📍 Map Teal</option>
+              <option value="⚡|bg-indigo-500">⚡ Utility Indigo</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="location-select" class="block text-xs font-medium text-slate-600 mb-1">Starting Map Location</label>
+            <select id="location-select" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Bhopal, India|23.2599|77.4126">Bhopal, India</option>
+              <option value="New Delhi, India|28.6139|77.2090">New Delhi, India</option>
+              <option value="Mumbai, India|19.0760|72.8777">Mumbai, India</option>
+              <option value="Tokyo, Japan|35.6762|139.6503">Tokyo, Japan</option>
+              <option value="London, UK|51.5074|-0.1278">London, UK</option>
+              <option value="New York, USA|40.7128|-74.0060">New York, USA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold text-sm px-6 py-2.5 transition shadow-sm"
+          >
+            + Create Clone
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Part 2: Your Cloned Apps -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-semibold text-slate-900">2. Your Cloned Instances</h2>
+        <p class="text-xs text-slate-500">Launch a clone to control its map pin &amp; session</p>
+      </div>
+
+      <div id="clones-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Cards rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Part 3: Virtual Map Location & Freeze Control -->
+    <section id="map-panel" class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base font-semibold text-slate-900">3. Virtual Map Location &amp; Freeze Pin</h2>
+          <p id="map-target-label" class="text-xs sm:text-sm text-slate-500">
+            Click anywhere on the map or drag the pin to set location for this clone
+          </p>
+        </div>
+
+        <button
+          id="freeze-toggle-btn"
+          type="button"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm bg-cyan-50 text-cyan-800 border border-cyan-200 hover:bg-cyan-100"
+        >
+          ❄️ Freeze Location Here
+        </button>
+      </div>
+
+      <!-- Quick Jump & Coordinate Bar -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" data-jump="Bhopal, India|23.2599|77.4126" class="jump-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Bhopal</button>
+          <button type="button" data-jump="New Delhi, India|28.6139|77.2090" class="jump-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Delhi</button>
+          <button type="button" data-jump="Mumbai, India|19.0760|72.8777" class="jump-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Mumbai</button>
+          <button type="button" data-jump="Tokyo, Japan|35.6762|139.6503" class="jump-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">Tokyo</button>
+          <button type="button" data-jump="London, UK|51.5074|-0.1278" class="jump-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">London</button>
+          <button type="button" data-jump="New York, USA|40.7128|-74.0060" class="jump-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">New York</button>
+        </div>
+
+        <form id="coord-jump-form" class="flex items-center gap-1.5 ml-auto">
+          <input
+            id="coord-jump-input"
+            type="text"
+            placeholder="Lat, Lng (e.g. 23.25, 77.41)"
+            class="w-44 sm:w-52 rounded-lg border border-slate-300 px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button type="submit" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white transition">
+            Go
+          </button>
+        </form>
+      </div>
+
+      <!-- Map Container -->
+      <div class="relative rounded-2xl overflow-hidden border border-slate-200">
+        <div id="virtual-map"></div>
+        <div id="map-freeze-overlay" class="hidden pointer-events-none absolute top-3 right-3 z-[400] px-3 py-1.5 rounded-full text-xs font-semibold bg-cyan-600 text-white shadow-md">
+          ❄️ Location Frozen
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 bg-slate-50 rounded-xl px-3 py-2">
+        <span>Active Pin: <strong id="map-coords-readout" class="text-slate-800">23.2599, 77.4126</strong></span>
+        <span id="map-status-hint">Click or drag pin to move • Click Freeze to lock</span>
+      </div>
+    </section>
+
+    <!-- Part 4: Active Isolated Session Viewer -->
+    <section id="session-panel" class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-3">
+          <div id="session-icon" class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg">
+            💬
+          </div>
+          <div>
+            <h2 id="session-title" class="text-base font-semibold text-slate-900">ChatWave — Personal</h2>
+            <p id="session-subtitle" class="text-xs text-slate-500">Isolated Sandbox #1 • Separate storage</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="session-location-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-100">
+            📍 Bhopal, India
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Running
+          </span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label for="session-note" class="block text-xs font-medium text-slate-600">
+          Account / Session Data (saved independently for this clone)
+        </label>
+        <input
+          id="session-note"
+          type="text"
+          placeholder="Type a username or note for this clone..."
+          class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+    </section>
+  </div>
+
+  <!-- Edit Clone Modal (Rename, Icon Change) -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Customize Clone</h3>
+        <button id="close-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-lg leading-none px-2 py-1">✕</button>
+      </div>
+
+      <form id="edit-form" class="space-y-3">
+        <div>
+          <label for="edit-app-name" class="block text-xs font-medium text-slate-600 mb-1">App Name (Rename)</label>
+          <input
+            id="edit-app-name"
+            type="text"
+            maxlength="30"
+            required
+            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label for="edit-label" class="block text-xs font-medium text-slate-600 mb-1">Instance Label</label>
+          <input
+            id="edit-label"
+            type="text"
+            maxlength="24"
+            required
+            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label for="edit-icon" class="block text-xs font-medium text-slate-600 mb-1">App Icon &amp; Color</label>
+          <select id="edit-icon" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="💬|bg-emerald-500">💬 Chat Green</option>
+            <option value="📸|bg-pink-500">📸 Social Pink</option>
+            <option value="🎮|bg-violet-500">🎮 Game Violet</option>
+            <option value="✉️|bg-sky-500">✉️ Mail Blue</option>
+            <option value="🛒|bg-amber-500">🛒 Shop Amber</option>
+            <option value="🎵|bg-rose-500">🎵 Music Rose</option>
+            <option value="📍|bg-teal-500">📍 Map Teal</option>
+            <option value="⚡|bg-indigo-500">⚡ Utility Indigo</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button id="cancel-modal-btn" type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'mochi_cloner_mini_v3';
+
+    const defaultState = {
+      clones: [
+        {
+          id: 1,
+          appName: 'ChatWave',
+          icon: '💬',
+          color: 'bg-emerald-500',
+          label: 'Personal',
+          locationName: 'Bhopal, India',
+          lat: 23.2599,
+          lng: 77.4126,
+          locationFrozen: false,
+          sessionData: 'Logged in as @shubham_personal'
+        },
+        {
+          id: 2,
+          appName: 'ChatWave',
+          icon: '💬',
+          color: 'bg-emerald-500',
+          label: 'Work',
+          locationName: 'Mumbai, India',
+          lat: 19.0760,
+          lng: 72.8777,
+          locationFrozen: true,
+          sessionData: 'Logged in as @shubham_office'
+        }
+      ],
+      activeCloneId: 1,
+      nextId: 3
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.clones)) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        // Ignore storage errors
+      }
+      return structuredClone(defaultState);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    const state = loadState();
+    let editingCloneId = null;
+
+    // DOM Elements
+    const cloneForm = document.getElementById('clone-form');
+    const appNameInput = document.getElementById('app-name-input');
+    const cloneLabelInput = document.getElementById('clone-label');
+    const iconSelect = document.getElementById('icon-select');
+    const locationSelect = document.getElementById('location-select');
+    const clonesGrid = document.getElementById('clones-grid');
+    const cloneCountBadge = document.getElementById('clone-count-badge');
+
+    const mapPanel = document.getElementById('map-panel');
+    const mapTargetLabel = document.getElementById('map-target-label');
+    const freezeToggleBtn = document.getElementById('freeze-toggle-btn');
+    const mapFreezeOverlay = document.getElementById('map-freeze-overlay');
+    const mapCoordsReadout = document.getElementById('map-coords-readout');
+    const mapStatusHint = document.getElementById('map-status-hint');
+    const coordJumpForm = document.getElementById('coord-jump-form');
+    const coordJumpInput = document.getElementById('coord-jump-input');
+
+    const sessionPanel = document.getElementById('session-panel');
+    const sessionIcon = document.getElementById('session-icon');
+    const sessionTitle = document.getElementById('session-title');
+    const sessionSubtitle = document.getElementById('session-subtitle');
+    const sessionLocationBadge = document.getElementById('session-location-badge');
+    const sessionNote = document.getElementById('session-note');
+
+    const editModal = document.getElementById('edit-modal');
+    const editForm = document.getElementById('edit-form');
+    const editAppName = document.getElementById('edit-app-name');
+    const editLabel = document.getElementById('edit-label');
+    const editIcon = document.getElementById('edit-icon');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+
+    // Initialize Leaflet Map with keyless ArcGIS World Street Map tiles
+    const map = L.map('virtual-map').setView([23.2599, 77.4126], 11);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri'
+    }).addTo(map);
+
+    const marker = L.marker([23.2599, 77.4126], { draggable: true }).addTo(map);
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatCoords(lat, lng) {
+      return `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
+    }
+
+    function updateCloneLocation(lat, lng, customName) {
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (!activeClone || activeClone.locationFrozen) return;
+
+      activeClone.lat = Number(lat);
+      activeClone.lng = Number(lng);
+      activeClone.locationName = customName || `Pinned (${formatCoords(lat, lng)})`;
+      saveState();
+      render();
+    }
+
+    // Map click to point location anywhere
+    map.on('click', (event) => {
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (!activeClone || activeClone.locationFrozen) return;
+      updateCloneLocation(event.latlng.lat, event.latlng.lng);
+    });
+
+    // Drag marker to fine-tune location
+    marker.on('dragend', () => {
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (!activeClone || activeClone.locationFrozen) {
+        if (activeClone) marker.setLatLng([activeClone.lat, activeClone.lng]);
+        return;
+      }
+      const pos = marker.getLatLng();
+      updateCloneLocation(pos.lat, pos.lng);
+    });
+
+    function render() {
+      const count = state.clones.length;
+      cloneCountBadge.textContent = `${count} ${count === 1 ? 'Clone' : 'Clones'} Active`;
+
+      if (count === 0) {
+        clonesGrid.innerHTML = `
+          <div class="sm:col-span-2 bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-center text-sm text-slate-500">
+            No clones yet. Use the form above to clone any app!
+          </div>
+        `;
+      } else {
+        clonesGrid.innerHTML = state.clones.map((clone) => {
+          const isActive = clone.id === state.activeCloneId;
+          return `
+            <div class="bg-white border ${isActive ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-slate-200'} rounded-2xl p-4 shadow-sm space-y-3 transition">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-11 h-11 shrink-0 rounded-xl ${clone.color} text-white flex items-center justify-center text-xl">
+                    ${clone.icon}
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm font-semibold text-slate-900 truncate">${escapeHtml(clone.appName)}</h3>
+                      <span class="px-2 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-600">#${clone.id}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 truncate">${escapeHtml(clone.label)}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    data-action="edit"
+                    data-id="${clone.id}"
+                    class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    data-action="launch"
+                    data-id="${clone.id}"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold ${isActive ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'} transition"
+                  >
+                    ${isActive ? 'Open' : 'Launch'}
+                  </button>
+                  <button
+                    type="button"
+                    data-action="delete"
+                    data-id="${clone.id}"
+                    aria-label="Delete clone"
+                    class="px-2 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs bg-slate-50 rounded-xl px-3 py-1.5">
+                <span class="truncate text-slate-600">📍 ${escapeHtml(clone.locationName)}</span>
+                <span class="shrink-0 ml-2 px-2 py-0.5 rounded-full text-[11px] font-medium ${clone.locationFrozen ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-200 text-slate-600'}">
+                  ${clone.locationFrozen ? '❄️ Frozen' : 'Unlocked'}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (activeClone) {
+        mapPanel.classList.remove('hidden');
+        sessionPanel.classList.remove('hidden');
+
+        // Sync Map & Marker
+        marker.setLatLng([activeClone.lat, activeClone.lng]);
+        if (activeClone.locationFrozen) {
+          marker.dragging.disable();
+          mapFreezeOverlay.classList.remove('hidden');
+          freezeToggleBtn.textContent = '🔓 Unfreeze Location';
+          freezeToggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm bg-cyan-600 text-white hover:bg-cyan-700';
+          mapStatusHint.textContent = 'Location is frozen! Unfreeze to move the pin.';
+        } else {
+          marker.dragging.enable();
+          mapFreezeOverlay.classList.add('hidden');
+          freezeToggleBtn.textContent = '❄️ Freeze Location Here';
+          freezeToggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm bg-cyan-50 text-cyan-800 border border-cyan-200 hover:bg-cyan-100';
+          mapStatusHint.textContent = 'Click anywhere on the map or drag pin, then Freeze to lock.';
+        }
+
+        mapTargetLabel.textContent = `Controlling virtual GPS for: ${activeClone.appName} — ${activeClone.label}`;
+        mapCoordsReadout.textContent = formatCoords(activeClone.lat, activeClone.lng);
+        map.panTo([activeClone.lat, activeClone.lng]);
+
+        // Sync Session Viewer
+        sessionIcon.className = `w-10 h-10 rounded-xl ${activeClone.color} text-white flex items-center justify-center text-lg`;
+        sessionIcon.textContent = activeClone.icon;
+        sessionTitle.textContent = `${activeClone.appName} — ${activeClone.label}`;
+        sessionSubtitle.textContent = `Isolated Sandbox #${activeClone.id} • Separate storage`;
+        sessionLocationBadge.textContent = `${activeClone.locationFrozen ? '❄️' : '📍'} ${activeClone.locationName}`;
+        sessionNote.value = activeClone.sessionData;
+      } else {
+        mapPanel.classList.add('hidden');
+        sessionPanel.classList.add('hidden');
+      }
+    }
+
+    // Create Clone Handler
+    cloneForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const appName = appNameInput.value.trim() || 'Custom App';
+      const customLabel = cloneLabelInput.value.trim();
+      const label = customLabel || `Clone ${state.nextId}`;
+      const [icon, color] = iconSelect.value.split('|');
+      const [locationName, latStr, lngStr] = locationSelect.value.split('|');
+
+      const newClone = {
+        id: state.nextId++,
+        appName,
+        icon,
+        color,
+        label,
+        locationName,
+        lat: Number(latStr),
+        lng: Number(lngStr),
+        locationFrozen: false,
+        sessionData: `Logged in as @${label.toLowerCase().replace(/\s+/g, '_')}`
+      };
+
+      state.clones.push(newClone);
+      state.activeCloneId = newClone.id;
+      cloneLabelInput.value = '';
+      saveState();
+      render();
+      map.setView([newClone.lat, newClone.lng], 11);
+    });
+
+    // Grid Action Handler
+    clonesGrid.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+
+      const id = Number(button.dataset.id);
+      const action = button.dataset.action;
+
+      if (action === 'launch') {
+        state.activeCloneId = id;
+        saveState();
+        render();
+        const activeClone = state.clones.find((c) => c.id === id);
+        if (activeClone) map.setView([activeClone.lat, activeClone.lng], 11);
+      } else if (action === 'edit') {
+        const clone = state.clones.find((c) => c.id === id);
+        if (clone) {
+          editingCloneId = clone.id;
+          editAppName.value = clone.appName;
+          editLabel.value = clone.label;
+          editIcon.value = `${clone.icon}|${clone.color}`;
+          editModal.classList.remove('hidden');
+        }
+      } else if (action === 'delete') {
+        state.clones = state.clones.filter((c) => c.id !== id);
+        if (state.activeCloneId === id) {
+          state.activeCloneId = state.clones.length > 0 ? state.clones[0].id : null;
+        }
+        saveState();
+        render();
+      }
+    });
+
+    // Freeze / Unfreeze Button
+    freezeToggleBtn.addEventListener('click', () => {
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (!activeClone) return;
+      activeClone.locationFrozen = !activeClone.locationFrozen;
+      saveState();
+      render();
+    });
+
+    // Quick City Jump Buttons
+    document.querySelectorAll('.jump-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+        if (!activeClone || activeClone.locationFrozen) return;
+        const [name, latStr, lngStr] = btn.dataset.jump.split('|');
+        const lat = Number(latStr);
+        const lng = Number(lngStr);
+        updateCloneLocation(lat, lng, name);
+        map.setView([lat, lng], 11);
+      });
+    });
+
+    // Coordinate Jump Form
+    coordJumpForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (!activeClone || activeClone.locationFrozen) return;
+
+      const parts = coordJumpInput.value.split(',').map((s) => Number(s.trim()));
+      if (parts.length === 2 && !Number.isNaN(parts[0]) && !Number.isNaN(parts[1])) {
+        const [lat, lng] = parts;
+        if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+          updateCloneLocation(lat, lng);
+          map.setView([lat, lng], 12);
+          coordJumpInput.value = '';
+        }
+      }
+    });
+
+    // Edit Modal Save & Close
+    editForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const clone = state.clones.find((c) => c.id === editingCloneId);
+      if (!clone) return;
+
+      clone.appName = editAppName.value.trim() || clone.appName;
+      clone.label = editLabel.value.trim() || clone.label;
+      const [icon, color] = editIcon.value.split('|');
+      clone.icon = icon;
+      clone.color = color;
+
+      saveState();
+      editingCloneId = null;
+      editModal.classList.add('hidden');
+      render();
+    });
+
+    function closeEditModal() {
+      editingCloneId = null;
+      editModal.classList.add('hidden');
+    }
+
+    closeModalBtn.addEventListener('click', closeEditModal);
+    cancelModalBtn.addEventListener('click', closeEditModal);
+
+    sessionNote.addEventListener('input', (event) => {
+      const activeClone = state.clones.find((c) => c.id === state.activeCloneId);
+      if (activeClone) {
+        activeClone.sessionData = event.target.value;
+        saveState();
+      }
+    });
+
+    window.addEventListener('load', () => {
+      render();
+      map.invalidateSize();
+    });
+  </script>
+</body>
+</html>
